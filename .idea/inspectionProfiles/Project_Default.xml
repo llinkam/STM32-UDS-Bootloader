@@ -1,0 +1,104 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="ClangTidy" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="clangTidyChecks" value="-*,bugprone-argument-comment,bugprone-assert-side-effect,bugprone-bad-signal-to-kill-thread,bugprone-branch-clone,bugprone-copy-constructor-init,bugprone-dangling-handle,bugprone-dynamic-static-initializers,bugprone-fold-init-type,bugprone-forward-declaration-namespace,bugprone-forwarding-reference-overload,bugprone-inaccurate-erase,bugprone-incorrect-roundings,bugprone-integer-division,bugprone-lambda-function-name,bugprone-macro-parentheses,bugprone-macro-repeated-side-effects,bugprone-misplaced-operator-in-strlen-in-alloc,bugprone-misplaced-pointer-arithmetic-in-alloc,bugprone-misplaced-widening-cast,bugprone-move-forwarding-reference,bugprone-multiple-statement-macro,bugprone-no-escape,bugprone-parent-virtual-call,bugprone-posix-return,bugprone-sizeof-container,bugprone-sizeof-expression,bugprone-spuriously-wake-up-functions,bugprone-string-constructor,bugprone-string-integer-assignment,bugprone-string-literal-with-embedded-nul,bugprone-suspicious-enum-usage,bugprone-suspicious-include,bugprone-suspicious-memset-usage,bugprone-suspicious-missing-comma,bugprone-suspicious-semicolon,bugprone-suspicious-string-compare,bugprone-suspicious-memory-comparison,bugprone-suspicious-realloc-usage,bugprone-swapped-arguments,bugprone-terminating-continue,bugprone-throw-keyword-missing,bugprone-too-small-loop-variable,bugprone-undefined-memory-manipulation,bugprone-undelegated-constructor,bugprone-unhandled-self-assignment,bugprone-unused-raii,bugprone-unused-return-value,bugprone-use-after-move,bugprone-virtual-near-miss,cert-dcl21-cpp,cert-dcl58-cpp,cert-err34-c,cert-err52-cpp,cert-err60-cpp,cert-flp30-c,cert-msc50-cpp,cert-msc51-cpp,cert-str34-c,cppcoreguidelines-interfaces-global-init,cppcoreguidelines-narrowing-conversions,cppcoreguidelines-pro-type-member-init,cppcoreguidelines-pro-type-static-cast-downcast,cppcoreguidelines-slicing,google-default-arguments,google-runtime-operator,hicpp-exception-baseclass,hicpp-multiway-paths-covered,misc-misplaced-const,misc-new-delete-overloads,misc-non-copyable-objects,misc-throw-by-value-catch-by-reference,misc-unconventional-assign-operator,misc-uniqueptr-reset-release,modernize-avoid-bind,modernize-concat-nested-namespaces,modernize-deprecated-headers,modernize-deprecated-ios-base-aliases,modernize-loop-convert,modernize-make-shared,modernize-make-unique,modernize-pass-by-value,modernize-raw-string-literal,modernize-redundant-void-arg,modernize-replace-auto-ptr,modernize-replace-disallow-copy-and-assign-macro,modernize-replace-random-shuffle,modernize-return-braced-init-list,modernize-shrink-to-fit,modernize-unary-static-assert,modernize-use-auto,modernize-use-bool-literals,modernize-use-emplace,modernize-use-equals-default,modernize-use-equals-delete,modernize-use-nodiscard,modernize-use-noexcept,modernize-use-nullptr,modernize-use-override,modernize-use-transparent-functors,modernize-use-uncaught-exceptions,mpi-buffer-deref,mpi-type-mismatch,openmp-use-default-none,performance-faster-string-find,performance-for-range-copy,performance-implicit-conversion-in-loop,performance-inefficient-algorithm,performance-inefficient-string-concatenation,performance-inefficient-vector-operation,performance-move-const-arg,performance-move-constructor-init,performance-no-automatic-move,performance-noexcept-move-constructor,performance-trivially-destructible,performance-type-promotion-in-math-fn,performance-unnecessary-copy-initialization,performance-unnecessary-value-param,portability-simd-intrinsics,readability-avoid-const-params-in-decls,readability-const-return-type,readability-container-size-empty,readability-convert-member-functions-to-static,readability-delete-null-pointer,readability-deleted-default,readability-inconsistent-declaration-parameter-name,readability-make-member-function-const,readability-misleading-indentation,readability-misplaced-array-index,readability-non-const-parameter,readability-redundant-control-flow,readability-redundant-declaration,readability-redundant-function-ptr-dereference,readability-redundant-smartptr-get,readability-redundant-string-cstr,readability-redundant-string-init,readability-simplify-subscript-expr,readability-static-accessed-through-instance,readability-static-definition-in-anonymous-namespace,readability-string-compare,readability-uniqueptr-delete-release,readability-use-anyofallof,-bugprone-reserved-identifier,-cert-dcl37-c,-cert-dcl51-cpp" />
+      <option name="preferClangTidyFilesOverIDESettings" value="false" />
+    </inspection_tool>
+    <inspection_tool class="ConstevalIfIsAlwaysConstant" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppAccessSpecifierWithNoDeclarations" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppCStyleCast" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppCompileTimeConstantCanBeReplacedWithBooleanConstant" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppConditionalExpressionCanBeSimplified" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppConstParameterInDeclaration" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppConstValueFunctionReturnType" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppDFAArrayIndexOutOfBounds" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppDFAEndlessLoop" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppDFAInfiniteRecursion" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppDFANotInitializedField" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppDFANullDereference" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppDFAUnusedValue" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppDiscardedPostfixOperatorResult" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppExpressionWithoutSideEffects" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppFinalFunctionInFinalClass" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppFinalNonOverridingVirtualFunction" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppForLoopCanBeReplacedWithWhile" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppFunctionalStyleCast" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppHeaderHasBeenAlreadyIncluded" enabled="false" level="HINT" enabled_by_default="false" />
+    <inspection_tool class="CppIfCanBeReplacedByConstexprIf" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppIncompleteSwitchStatement" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppJoinDeclarationAndAssignment" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppLocalVariableMayBeConst" enabled="false" level="HINT" enabled_by_default="false" />
+    <inspection_tool class="CppLocalVariableMightNotBeInitialized" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppMemberFunctionMayBeConst" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppMemberFunctionMayBeStatic" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppMissingIncludeGuard" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppMissingKeywordThrow" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppNonExplicitConversionOperator" enabled="false" level="HINT" enabled_by_default="false" />
+    <inspection_tool class="CppNonExplicitConvertingConstructor" enabled="false" level="HINT" enabled_by_default="false" />
+    <inspection_tool class="CppObjectMemberMightNotBeInitialized" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppParameterMayBeConst" enabled="false" level="HINT" enabled_by_default="false" />
+    <inspection_tool class="CppParameterMayBeConstPtrOrRef" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppPassValueParameterByConstReference" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppPossiblyErroneousEmptyStatements" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppPossiblyUninitializedMember" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppPossiblyUnintendedObjectSlicing" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppPrintfRiskyFormat" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppRangeBasedForIncompatibleReference" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppRedundantAccessSpecifier" enabled="false" level="HINT" enabled_by_default="false" />
+    <inspection_tool class="CppRedundantBaseClassAccessSpecifier" enabled="false" level="HINT" enabled_by_default="false" />
+    <inspection_tool class="CppRedundantBaseClassInitializer" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppRedundantBooleanExpressionArgument" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppRedundantCastExpression" enabled="false" level="HINT" enabled_by_default="false" />
+    <inspection_tool class="CppRedundantConditionalExpression" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppRedundantConstSpecifier" enabled="false" level="HINT" enabled_by_default="false" />
+    <inspection_tool class="CppRedundantControlFlowJump" enabled="false" level="HINT" enabled_by_default="false" />
+    <inspection_tool class="CppRedundantDereferencingAndTakingAddress" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppRedundantElaboratedTypeSpecifier" enabled="false" level="HINT" enabled_by_default="false" />
+    <inspection_tool class="CppRedundantElseKeyword" enabled="false" level="HINT" enabled_by_default="false" />
+    <inspection_tool class="CppRedundantElseKeywordInsideCompoundStatement" enabled="false" level="HINT" enabled_by_default="false" />
+    <inspection_tool class="CppRedundantEmptyDeclaration" enabled="false" level="HINT" enabled_by_default="false" />
+    <inspection_tool class="CppRedundantEmptyStatement" enabled="false" level="HINT" enabled_by_default="false" />
+    <inspection_tool class="CppRedundantExportKeyword" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppRedundantFwdClassOrEnumSpecifier" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppRedundantInlineSpecifier" enabled="false" level="HINT" enabled_by_default="false" />
+    <inspection_tool class="CppRedundantLambdaParameterList" enabled="false" level="HINT" enabled_by_default="false" />
+    <inspection_tool class="CppRedundantMemberInitializer" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppRedundantNamespaceDefinition" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppRedundantParentheses" enabled="false" level="HINT" enabled_by_default="false" />
+    <inspection_tool class="CppRedundantQualifier" enabled="false" level="HINT" enabled_by_default="false" />
+    <inspection_tool class="CppRedundantStaticSpecifierOnMemberAllocationFunction" enabled="false" level="HINT" enabled_by_default="false" />
+    <inspection_tool class="CppRedundantStaticSpecifierOnThreadLocalLocalVariable" enabled="false" level="HINT" enabled_by_default="false" />
+    <inspection_tool class="CppRedundantTemplateArguments" enabled="false" level="HINT" enabled_by_default="false" />
+    <inspection_tool class="CppRedundantTemplateKeyword" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppRedundantTypenameKeyword" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppRedundantVoidArgumentList" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppRedundantZeroInitializerInAggregateInitialization" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppReinterpretCastFromVoidPtr" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppReplaceMemsetWithZeroInitialization" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppReplaceTieWithStructuredBinding" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppSmartPointerVsMakeFunction" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppSomeObjectMembersMightNotBeInitialized" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppStaticSpecifierOnAnonymousNamespaceMember" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppTemplateArgumentsCanBeDeduced" enabled="false" level="HINT" enabled_by_default="false" />
+    <inspection_tool class="CppThrowExpressionCanBeReplacedWithRethrow" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppTooWideScope" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppTooWideScopeInitStatement" enabled="false" level="HINT" enabled_by_default="false" />
+    <inspection_tool class="CppUninitializedDependentBaseClass" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppUnusedIncludeDirective" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppUseAlgorithmWithCount" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppUseAssociativeContains" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppUseElementsView" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppUseEraseAlgorithm" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppUseFamiliarTemplateSyntaxForGenericLambdas" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppUseRangeAlgorithm" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppUseStdSize" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppUseStructuredBinding" enabled="false" level="HINT" enabled_by_default="false" />
+    <inspection_tool class="CppUseTypeTraitAlias" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppVariableCanBeMadeConstexpr" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppVolatileParameterInDeclaration" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppZeroConstantCanBeReplacedWithNullptr" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="IfStdIsConstantEvaluatedCanBeReplaced" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="StdIsConstantEvaluatedWillAlwaysEvaluateToConstant" enabled="false" level="WARNING" enabled_by_default="false" />
+  </profile>
+</component>
