@@ -23,7 +23,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "isotp.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -89,16 +89,23 @@ int main(void)
   MX_GPIO_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-
+  Can_Init();
+  CAN_TxHeaderTypeDef pHeader={0x111,0,CAN_ID_STD,CAN_RTR_DATA,8,DISABLE};
+  uint32_t pTxMailbox;
+  uint8_t testData[15]={0x91,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0xAA,0xBB,0xCC,0xDD,0xDE,0xDF};
+  uint8_t rxdata[15]={0};
+  uint8_t SN=0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    /* USER CODE END WHILE */
-
-    /* USER CODE BEGIN 3 */
+    isotp_Sent(&pHeader, testData, rxdata, 15, &pTxMailbox);
+    isotp_Receive(rxdata, &SN);
+    //HAL_UART_Transmit(&huart1, (uint8_t*)rxdata, 15, HAL_MAX_DELAY);
+    HAL_UART_Transmit(&huart1, (uint8_t*)&SN, 1, HAL_MAX_DELAY);
+    HAL_Delay(500);
   }
   /* USER CODE END 3 */
 }
