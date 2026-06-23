@@ -45,11 +45,16 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources here
+        ICode/Can.c
+        ICode/isotp.c
+        Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_can.c
 )
 
 # Add include paths
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined include paths
+        ICode
+        Drivers
 )
 
 # Add project symbols (macros)

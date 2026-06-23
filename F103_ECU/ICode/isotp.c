@@ -4,7 +4,10 @@
 #include "isotp.h"
 extern UART_HandleTypeDef huart1;
 int8_t FC_Return_Value;
-uint8_t RX_data[8];
+static uint16_t RX_Data_Len;
+static uint8_t Already_Receive_Data;
+static uint8_t ISOTP_FC_Status;
+volatile uint8_t frame_ready;
 int8_t RX_Data()
 {
 	if ((CAN_RxData[0]&0xF0)!=ISOTP_FC)
@@ -84,60 +87,53 @@ void isotp_Sent(CAN_TxHeaderTypeDef *pHeader,const uint8_t *TData,uint8_t *RData
 		}
 	}
 }
-void isotp_Receive(uint8_t *RData,uint8_t *SN)
+void isotp_Receive(CAN_TxHeaderTypeDef *pHeader,uint8_t *RData,uint8_t *SN,uint32_t *pTxMailbox)
 {
-	while (HAL_CAN_GetRxFifoFillLevel(&hcan1, CAN_RX_FIFO0) == 0);
-	HAL_CAN_GetRxMessage(&hcan1,CAN_RX_FIFO0,&CAN_RxHeader,CAN_RxData);
 	// 单帧
 	if ((CAN_RxData[0]&0xF0)==ISOTP_SF)
 	{
-		uint8_t len;
-		len=CAN_RxData[0]&0x0F;
-		for (uint8_t i=0;i<len;i++)
+		RX_Data_Len=CAN_RxData[0]&0x0F;
+		for (uint8_t i=0;i<RX_Data_Len;i++)
 		{
 			RData[i]=CAN_RxData[i+1];
 		}
+		frame_ready=1;
 	}
 	// 多帧
 	if ((CAN_RxData[0]&0xF0)==ISOTP_FF)
 	{
-		uint16_t len=((CAN_RxData[0]&0x0F)<<8)|(CAN_RxData[1]);
-		uint8_t Already_Receive_Data=0;
+		RX_Data_Len=((CAN_RxData[0]&0x0F)<<8)|(CAN_RxData[1]);
 		for (uint8_t i=0;i<6;i++)
 		{
 			RData[i]=CAN_RxData[i+2];
 		}
-		len=len-6;
+		RX_Data_Len-=6;
 		Already_Receive_Data=6;
-		while (len>7)
+	}
+	if ((CAN_RxData[0]&0xF0)==ISOTP_CF)
+	{
+		*SN=CAN_RxData[0]&0x0F;
+		if (RX_Data_Len>7)
 		{
-			while (HAL_CAN_GetRxFifoFillLevel(&hcan1, CAN_RX_FIFO0) == 0);
-			HAL_CAN_GetRxMessage(&hcan1,CAN_RX_FIFO0,&CAN_RxHeader,CAN_RxData);
-			if ((CAN_RxData[0]&0xF0)==ISOTP_CF)
+			for (uint8_t i=0;i<7;i++)
 			{
-				*SN=CAN_RxData[0]&0x0F;
-				for (uint8_t i=0;i<7;i++)
-				{
-					RData[Already_Receive_Data]=CAN_RxData[i+1];
-					Already_Receive_Data++;
-				}
+				RData[Already_Receive_Data]=CAN_RxData[i+1];
+				Already_Receive_Data++;
 			}
-			len=len-7;
+			RX_Data_Len-=7;
 		}
-		if (len>0&&len<=7)
+		else
 		{
-			while (HAL_CAN_GetRxFifoFillLevel(&hcan1, CAN_RX_FIFO0) == 0);
-			HAL_CAN_GetRxMessage(&hcan1,CAN_RX_FIFO0,&CAN_RxHeader,CAN_RxData);
-			if ((CAN_RxData[0]&0xF0)==ISOTP_CF)
+			for (uint8_t i=0;i<RX_Data_Len;i++)
 			{
-				*SN=CAN_RxData[0]&0x0F;
-				for (uint8_t i=0;i<len;i++)
-				{
-					RData[Already_Receive_Data]=CAN_RxData[i+1];
-					Already_Receive_Data++;
-				}
+				RData[Already_Receive_Data]=CAN_RxData[i+1];
+				Already_Receive_Data++;
 			}
+			RX_Data_Len=0;
+			frame_ready=1;
 		}
 	}
 }
+
+
 

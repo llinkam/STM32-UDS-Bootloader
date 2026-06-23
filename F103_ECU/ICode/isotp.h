@@ -20,6 +20,7 @@
 #define ISOTP_FC_CTS    0x00  /* 继续发 */
 #define ISOTP_FC_WAIT   0x01  /* 等待 */
 #define ISOTP_FC_OVFLW  0x02  /* 溢出,中止 */
+extern volatile uint8_t frame_ready;   /* 中断里收齐一条完整报文后置1,主循环消费后清0 */
 void isotp_init(void);
 /**
  * @brief  发送一段数据(自动判断单帧还是多帧)
@@ -35,5 +36,5 @@ void isotp_Sent(CAN_TxHeaderTypeDef *pHeader,const uint8_t *TData,uint8_t *RData
  * @param  dlc    这一帧的数据长度
  */
 
-void isotp_Receive(uint8_t *RData,uint8_t *SN);
+void isotp_Receive(CAN_TxHeaderTypeDef *pHeader,uint8_t *RData,uint8_t *SN,uint32_t *pTxMailbox);
 #endif //CAN_TEST1_ISOTP_H
