@@ -28,7 +28,7 @@ void isotp_init(void);
  * @param  TData  载荷指针
  * @param  Len   载荷长度(0~4095)
  */
-void isotp_Sent(CAN_TxHeaderTypeDef *pHeader,const uint8_t *TData,uint8_t *RData,uint16_t Len,uint32_t *pTxMailbox);
+void isotp_Sent(CAN_TxHeaderTypeDef *pHeader,const uint8_t *TData,uint16_t Len,uint32_t *pTxMailbox);
 
 /**
  * @brief  喂入一帧 CAN 数据,内部按 SF/FF/CF 自动重组;收齐一条完整报文后交付

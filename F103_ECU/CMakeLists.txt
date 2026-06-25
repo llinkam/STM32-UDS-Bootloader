@@ -47,6 +47,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources here
         ICode/Can.c
         ICode/isotp.c
+        ICode/UDS.c
         Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_can.c
 )
 

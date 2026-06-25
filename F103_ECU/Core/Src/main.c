@@ -24,6 +24,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "isotp.h"
+#include "UDS.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -92,22 +93,19 @@ int main(void)
   Can_Init();
   CAN_TxHeaderTypeDef pHeader={0x111,0,CAN_ID_STD,CAN_RTR_DATA,8,DISABLE};
   uint32_t pTxMailbox;
-  uint8_t testData[16]={0x91,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0xAA,0xBB,0xCC,0xDD,0xDE,0xDF,0x00};
+  uint8_t TXData[3]={0x31,0x00,0x00};
   extern uint8_t rxdata[16];
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  isotp_Sent(&pHeader,TXData, 3, &pTxMailbox);
   while (1)
   {
 
-    isotp_Sent(&pHeader, testData, rxdata, 16, &pTxMailbox);
     HAL_Delay(500);
-    if (frame_ready)
-    {
-      HAL_UART_Transmit(&huart1, (uint8_t*)rxdata, 15, HAL_MAX_DELAY);
-      frame_ready = 0;
-    }
+    UDS_Divide_ID();
+    HAL_UART_Transmit(&huart1, (uint8_t *)rxdata, 3, 1000);
   }
   /* USER CODE END 3 */
 }
