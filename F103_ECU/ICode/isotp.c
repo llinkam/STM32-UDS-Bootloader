@@ -3,30 +3,12 @@
 //
 #include "isotp.h"
 extern UART_HandleTypeDef huart1;
-int8_t FC_Return_Value;
 static uint16_t RX_Data_Len;
 static uint8_t Already_Receive_Data;
-static uint8_t ISOTP_FC_Status;
 volatile uint8_t frame_ready;
-int8_t RX_Data()
+void isotp_Init(void)
 {
-	if ((CAN_RxData[0]&0xF0)!=ISOTP_FC)
-	{
-		FC_Return_Value=0;
-	}
-	if ((CAN_RxData[0]&0xF0)==ISOTP_FC&&(CAN_RxData[0]&0x0F)==ISOTP_FC_CTS)
-	{
-		FC_Return_Value=1;
-	}
-	if ((CAN_RxData[0]&0xF0)==ISOTP_FC&&(CAN_RxData[0]&0x0F)==ISOTP_FC_WAIT)
-	{
-		FC_Return_Value=0;
-	}
-	if ((CAN_RxData[0]&0xF0)==ISOTP_FC&&(CAN_RxData[0]&0x0F)==ISOTP_FC_OVFLW)
-	{
-		FC_Return_Value=-1;
-	}
-	return FC_Return_Value;
+	Can_Init();
 }
 void isotp_Sent(CAN_TxHeaderTypeDef *pHeader,const uint8_t *TData,uint16_t Len,uint32_t *pTxMailbox)
 {
@@ -87,7 +69,7 @@ void isotp_Sent(CAN_TxHeaderTypeDef *pHeader,const uint8_t *TData,uint16_t Len,u
 		}
 	}
 }
-void isotp_Receive(CAN_TxHeaderTypeDef *pHeader,uint8_t *RData,uint8_t *SN,uint32_t *pTxMailbox)
+void isotp_Receive(uint8_t *RData,uint8_t *SN,uint32_t *pRxMailbox)
 {
 	// 单帧
 	if ((CAN_RxData[0]&0xF0)==ISOTP_SF)

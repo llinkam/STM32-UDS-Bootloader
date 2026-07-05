@@ -4,15 +4,14 @@
 #include "Can.h"
 #include "usart.h"
 #include "isotp.h"
+GPIO_InitTypeDef can1_gpio;
 CAN_HandleTypeDef hcan1;
 CAN_FilterTypeDef sFilterConfig;
-GPIO_InitTypeDef can1_gpio;
-CAN_RxHeaderTypeDef CAN_RxHeader;
+extern CAN_RxHeaderTypeDef CAN_RxHeader;
 uint8_t CAN_RxData[8];
-CAN_TxHeaderTypeDef pHeader;
-uint8_t SN;
-uint8_t rxdata[16];
-uint32_t pTxMailbox;
+extern uint8_t RXData[64];
+extern uint8_t SN;
+extern uint32_t pRxMailbox;
 void Can_MSP_Init(void)
 {
     __HAL_RCC_CAN1_CLK_ENABLE();
@@ -61,15 +60,12 @@ void Can_Init(void)
 		HAL_CAN_ActivateNotification(&hcan1,CAN_IT_RX_FIFO0_MSG_PENDING);
 }
 
-void CAN1_Transmit(const CAN_TxHeaderTypeDef *pHeader,const uint8_t aData[], uint32_t *pTxMailbox)
+void CAN1_Transmit(const CAN_TxHeaderTypeDef *TXpHeader,const uint8_t aData[], uint32_t *pTxMailbox)
 {
-	HAL_CAN_AddTxMessage(&hcan1,pHeader,aData,pTxMailbox);
+	HAL_CAN_AddTxMessage(&hcan1,TXpHeader,aData,pTxMailbox);
 }
-
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
 	HAL_CAN_GetRxMessage(&hcan1,CAN_RX_FIFO0,&CAN_RxHeader,CAN_RxData);
-	isotp_Receive(&pHeader,rxdata, &SN,&pTxMailbox);
-	// HAL_UART_Transmit(&huart1,CAN_RxData,CAN_RxHeader.DLC,1000);
+	isotp_Receive(RXData,&SN,&pRxMailbox);
 }
-

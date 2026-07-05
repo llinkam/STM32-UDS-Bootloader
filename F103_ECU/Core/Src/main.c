@@ -23,6 +23,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "Can.h"
 #include "isotp.h"
 #include "UDS.h"
 /* USER CODE END Includes */
@@ -56,7 +57,12 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+uint8_t RXData[64];
+CAN_TxHeaderTypeDef TXHeader={0x111,0,CAN_ID_STD,CAN_RTR_DATA,8,DISABLE};
+CAN_RxHeaderTypeDef CAN_RxHeader;
+uint32_t pTxMailbox;
+uint32_t pRxMailbox;
+uint8_t SN;
 /* USER CODE END 0 */
 
 /**
@@ -90,22 +96,18 @@ int main(void)
   MX_GPIO_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-  Can_Init();
-  CAN_TxHeaderTypeDef pHeader={0x111,0,CAN_ID_STD,CAN_RTR_DATA,8,DISABLE};
-  uint32_t pTxMailbox;
-  uint8_t TXData[3]={0x31,0x00,0x00};
-  extern uint8_t rxdata[16];
+  UDS_Init();
+  uint8_t TXData[15]={0x34,0x02,0x12,0x39};
   /* USER CODE END 2 */
-
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  isotp_Sent(&pHeader,TXData, 3, &pTxMailbox);
+  isotp_Sent(&TXHeader,TXData,2, &pTxMailbox);
+
   while (1)
   {
-
     HAL_Delay(500);
-    UDS_Divide_ID();
-    HAL_UART_Transmit(&huart1, (uint8_t *)rxdata, 3, 1000);
+    UDS_Divide_ID(RXData);
+    HAL_UART_Transmit(&huart1,RXData,3,HAL_MAX_DELAY);
   }
   /* USER CODE END 3 */
 }

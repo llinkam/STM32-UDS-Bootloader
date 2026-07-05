@@ -21,7 +21,6 @@
 #define ISOTP_FC_WAIT   0x01  /* 等待 */
 #define ISOTP_FC_OVFLW  0x02  /* 溢出,中止 */
 extern volatile uint8_t frame_ready;   /* 中断里收齐一条完整报文后置1,主循环消费后清0 */
-void isotp_init(void);
 /**
  * @brief  发送一段数据(自动判断单帧还是多帧)
  * @param  pHeader
@@ -29,12 +28,6 @@ void isotp_init(void);
  * @param  Len   载荷长度(0~4095)
  */
 void isotp_Sent(CAN_TxHeaderTypeDef *pHeader,const uint8_t *TData,uint16_t Len,uint32_t *pTxMailbox);
-
-/**
- * @brief  喂入一帧 CAN 数据,内部按 SF/FF/CF 自动重组;收齐一条完整报文后交付
- * @param  frame  这一帧的数据(最多8字节,首字节是 PCI)
- * @param  dlc    这一帧的数据长度
- */
-
-void isotp_Receive(CAN_TxHeaderTypeDef *pHeader,uint8_t *RData,uint8_t *SN,uint32_t *pTxMailbox);
+void isotp_Receive(uint8_t *RData,uint8_t *SN,uint32_t *pRxMailbox);
+void isotp_Init(void);
 #endif //CAN_TEST1_ISOTP_H

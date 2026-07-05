@@ -12,5 +12,6 @@ extern uint8_t CAN_RxData[8];
 void Can_MSP_Init(void);
 void Can_Init(void);
 void CAN1_Transmit(const CAN_TxHeaderTypeDef *pHeader,const uint8_t aData[], uint32_t *pTxMailbox);
+void CAN1_Recieve(CAN_RxHeaderTypeDef *RXpHeader,uint8_t *RData,uint8_t *SN,uint32_t *pRxMailbox);
 #define CAN_TEST_CAN_H
 #endif //CAN_TEST_CAN_H
