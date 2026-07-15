@@ -200,7 +200,7 @@ void SysTick_Handler(void)
 
 /* USER CODE BEGIN 1 */
 extern CAN_HandleTypeDef hcan1;
-void CAN1_RX0_IRQHandler(void)
+void USB_LP_CAN1_RX0_IRQHandler(void)
 {
   HAL_CAN_IRQHandler(&hcan1);
 }

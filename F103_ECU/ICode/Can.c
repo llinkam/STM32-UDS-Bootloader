@@ -9,7 +9,7 @@ CAN_HandleTypeDef hcan1;
 CAN_FilterTypeDef sFilterConfig;
 extern CAN_RxHeaderTypeDef CAN_RxHeader;
 uint8_t CAN_RxData[8];
-extern uint8_t RXData[64];
+extern uint8_t RXData[1024];
 extern uint8_t SN;
 extern uint32_t pRxMailbox;
 void Can_MSP_Init(void)
@@ -30,17 +30,17 @@ void Can_Init(void)
     Can_MSP_Init();
     hcan1.Instance = CAN1;
     hcan1.ErrorCode = HAL_CAN_ERROR_NONE;
-    hcan1.Init.AutoRetransmission=DISABLE;
+    hcan1.Init.AutoRetransmission=ENABLE;
     hcan1.Init.AutoBusOff=ENABLE;
     hcan1.Init.AutoWakeUp=ENABLE;
-    hcan1.Init.Mode=CAN_MODE_LOOPBACK;
+    hcan1.Init.Mode=CAN_MODE_NORMAL;
     hcan1.Init.ReceiveFifoLocked=ENABLE;
 		hcan1.Init.Prescaler    = 4;
-		hcan1.Init.SyncJumpWidth = CAN_SJW_1TQ;
-		hcan1.Init.TimeSeg1     = CAN_BS1_8TQ;
-		hcan1.Init.TimeSeg2     = CAN_BS2_3TQ;
+		hcan1.Init.SyncJumpWidth= CAN_SJW_1TQ;
+		hcan1.Init.TimeSeg1     = CAN_BS1_13TQ;
+		hcan1.Init.TimeSeg2     = CAN_BS2_2TQ;
     hcan1.Init.TimeTriggeredMode=DISABLE;
-    hcan1.Init.TransmitFifoPriority=DISABLE;
+		hcan1.Init.TransmitFifoPriority=ENABLE;
     hcan1.State = HAL_CAN_STATE_RESET;
     HAL_CAN_Init(&hcan1);
     sFilterConfig.FilterActivation=CAN_FILTER_ENABLE;
@@ -62,6 +62,14 @@ void Can_Init(void)
 
 void CAN1_Transmit(const CAN_TxHeaderTypeDef *TXpHeader,const uint8_t aData[], uint32_t *pTxMailbox)
 {
+	uint32_t StartTick=HAL_GetTick();
+	while (HAL_CAN_GetTxMailboxesFreeLevel(&hcan1)==0U)
+	{
+		if ((HAL_GetTick()-StartTick)>100U)
+		{
+			return;
+		}
+	}
 	HAL_CAN_AddTxMessage(&hcan1,TXpHeader,aData,pTxMailbox);
 }
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)

@@ -18,12 +18,16 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "can.h"
 #include "usart.h"
 #include "gpio.h"
-
+#include "isotp.h"
+#include "UDS.h"
+#include "Tester.h"
+#include <stdint.h>
+#include "FirmwareImage.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "Can.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -55,6 +59,9 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+uint32_t pTxMailbox;
+CAN_TxHeaderTypeDef TXHeader={0x7E0,0,CAN_ID_STD,CAN_RTR_DATA ,8,DISABLE};
+
 
 /* USER CODE END 0 */
 
@@ -88,20 +95,21 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART1_UART_Init();
+  MX_CAN1_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-	Can_Init();
-	CAN_TxHeaderTypeDef pHeader = {0x111, 0, CAN_ID_STD, CAN_RTR_DATA, 8, DISABLE};
-	uint32_t pTxMailbox;
-	uint8_t aData[8] = {0x11, 0x10, 0x88, 0x12, 0x22, 0x12, 0x22, 0x12};
+  HAL_Delay(1000);
+  Tester_Init();
+
   while (1)
   {
     /* USER CODE END WHILE */
-
+    Tester_Process( FirmwareImage, FirmwareImageSize);
+    HAL_Delay(1);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */

@@ -5,8 +5,6 @@
 #define F103_ECU_UDS_H
 #include "Can.h"
 #include "isotp.h"
-#define MINFlashAddress 0x08008000
-#define MIXFlashSize 0x08010000
 #define ArraySize(arr) (sizeof(arr)/sizeof(arr[0]))
 /* UDS 服务 ID：Tester 发请求时用 SID，ECU 正响应一般是 SID + 0x40。 */
 #define ReadDataByIdentifier       0x22
@@ -21,31 +19,22 @@
 #define SecurityAccess_RequestSeed_Level1   0x01 // 请求种子 1
 #define SecurityAccess_SendKey_Level1       0x02 // 发送密钥 1
 
-#define  RequestDownload 0x34 // 请求下载,要有地址起始位置,下载数据大小
+#define  RequestDownload 0x34 // 请求下载,要有地址起始位置，下载数据大小
 #define  DownloadData 0x36 // 下载数据,要包含下载数据
-#define	 RequestTransferExit 0x37 //告知ECU其固件下载结束,结束下载
 /* UDS Negative Response Code (NRC)：负响应码
  * ECU 无法执行请求时，返回格式为：7F + 原请求SID + NRC
  */
-#define NRC_ServiceNotSupported                   0x11  /* 不支持该服务，比如收到未实现的 SID */
-#define NRC_SubFunctionNotSupported               0x12  /* 不支持该子功能，比如 27 05 */
-#define NRC_IncorrectMessageLengthOrInvalidFormat 0x13  /* 报文长度错误或格式不合法 */
-#define NRC_ConditionsNotCorrect                  0x22  /* 当前条件不满足，比如当前会话不允许执行该服务 */
-#define NRC_RequestSequenceError                  0x24  /* 请求顺序错误，比如没先 27 01 就直接 27 02 */
-#define NRC_RequestOutOfRange                     0x31  /* 请求参数超范围，比如 DID 不存在、地址越界 */
-#define NRC_SecurityAccessDenied                  0x33  /* 安全访问被拒绝，比如未解锁就请求刷写 */
-#define NRC_InvalidKey                            0x35  /* SecurityAccess 密钥错误 */
-#define NRC_ExceedNumberOfAttempts                0x36  /* 密钥错误次数超过限制 */
-#define NRC_RequiredTimeDelayNotExpired           0x37  /* 错误次数过多后，等待时间未到 */
-#define NRC_WrongBlockSequenceCounter							0x73	/* 0x36数据块序号与ECU期望的序号不一致 */
-#define NRC_ResponsePending                       0x78  /* 请求处理中，ECU 暂时无法立即给最终响应 */
-#define NRC_GeneralProgrammingFailure             0x72   /* Flash擦除、写入或读回验证失败 */
-#define NRC_Enddownloadprematurely								0x74   /* 提前结束下载*/
-typedef enum
-{
-	ok       = 0x00U,
-	error    = 0x01U,
-}UDS_ReturnStatus_t;
+#define NRC_ServiceNotSupported                    0x11  /* 不支持该服务，比如收到未实现的 SID */
+#define NRC_SubFunctionNotSupported                0x12  /* 不支持该子功能，比如 27 05 */
+#define NRC_IncorrectMessageLengthOrInvalidFormat  0x13  /* 报文长度错误或格式不合法 */
+#define NRC_ConditionsNotCorrect                   0x22  /* 当前条件不满足，比如当前会话不允许执行该服务 */
+#define NRC_RequestSequenceError                   0x24  /* 请求顺序错误，比如没先 27 01 就直接 27 02 */
+#define NRC_RequestOutOfRange                      0x31  /* 请求参数超范围，比如 DID 不存在、地址越界 */
+#define NRC_SecurityAccessDenied                   0x33  /* 安全访问被拒绝，比如未解锁就请求刷写 */
+#define NRC_InvalidKey                             0x35  /* SecurityAccess 密钥错误 */
+#define NRC_ExceedNumberOfAttempts                 0x36  /* 密钥错误次数超过限制 */
+#define NRC_RequiredTimeDelayNotExpired            0x37  /* 错误次数过多后，等待时间未到 */
+#define NRC_ResponsePending                        0x78  /* 请求处理中，ECU 暂时无法立即给最终响应 */
 typedef struct
 {
 	uint8_t Lock;                    /* 安全锁状态：ENABLE=未解锁，DISABLE=已解锁 */
@@ -59,8 +48,8 @@ typedef struct
 	uint8_t ExpectedBlockCounter;  /* 下一帧 0x36 期望的 blockSequenceCounter */
 	uint32_t AlreadyWriteenAddress; /* 已经写入 Flash 的地址 */
 	uint16_t AlreadyDealData; /* 已经写入的数据  */
-
 } UDS_Status_t;
+extern UDS_Status_t UDS_Status;
 /* UDS 顶层服务分发表项。
  * id：UDS 服务 ID，比如 0x22、0x10。
  * handler：对应服务处理函数，输入是 ISO-TP 已经重组好的完整应用层数据 RXData。
@@ -101,8 +90,5 @@ void UDS_Init(void);
 void UDS_ReadDataByIdentifier(uint8_t *RXData);
 void UDS_Divide_ID(uint8_t *RXData);
 void UDS_Execute(uint8_t *RXData);
-UDS_ReturnStatus_t UDS_FlashWrite(uint8_t *RXData);
-void UDS_Flasherase(FLASH_EraseInitTypeDef *pEraseInit, uint32_t *PageError,HAL_StatusTypeDef *ErrorCode);
-extern volatile uint8_t AppJumpRequested;
-extern UDS_Status_t UDS_Status;
+void UDS_FlashWrite(uint8_t *RXData);
 #endif //F103_ECU_UDS_H

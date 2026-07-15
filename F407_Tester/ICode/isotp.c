@@ -2,14 +2,47 @@
 // Created by 飞行雪绒 on 2026/6/16.
 //
 #include "isotp.h"
+CAN_RxHeaderTypeDef CAN_RxHeader;
+uint8_t CAN_RxData[8];
+uint8_t RXData[1024];
 extern UART_HandleTypeDef huart1;
 static uint16_t RX_Data_Len;
 static uint8_t ExpectedSN;
 uint16_t RX_UDSDataLen;
 volatile uint8_t frame_ready;
+uint8_t SN;
+uint32_t pRxMailbox;
+volatile HAL_StatusTypeDef isotp_last_can_tx_status = HAL_OK;
+void CAN1_Transmit(const CAN_TxHeaderTypeDef *TXpHeader, const uint8_t aData[], uint32_t *pTxMailbox)
+{
+	uint32_t StartTick=HAL_GetTick();
+	while (HAL_CAN_GetTxMailboxesFreeLevel(&hcan1)==0U)
+	{
+		if ((HAL_GetTick()-StartTick)>100U)
+		{
+			isotp_last_can_tx_status=HAL_TIMEOUT;
+			return;
+		}
+	}
+	isotp_last_can_tx_status = HAL_CAN_AddTxMessage(&hcan1, TXpHeader, aData, pTxMailbox);
+	if (isotp_last_can_tx_status!=HAL_OK)
+	{
+		return;
+	}
+	StartTick=HAL_GetTick();
+	while (HAL_CAN_IsTxMessagePending(&hcan1,*pTxMailbox)!=0U)
+	{
+		if ((HAL_GetTick()-StartTick)>100U)
+		{
+			HAL_CAN_AbortTxRequest(&hcan1,*pTxMailbox);
+			isotp_last_can_tx_status=HAL_TIMEOUT;
+			return;
+		}
+	}
+}
 void isotp_Init(void)
 {
-	Can_Init();
+	MX_CAN1_Init();
 }
 void isotp_Sent(CAN_TxHeaderTypeDef *pHeader,const uint8_t *TData,uint16_t Len,uint32_t *pTxMailbox)
 {
@@ -125,6 +158,14 @@ void isotp_Receive(uint8_t *RData,uint8_t *SN,uint32_t *pRxMailbox)
 			RX_Data_Len=0;
 			frame_ready=1;
 		}
+	}
+}
+void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
+{
+	if (hcan->Instance == CAN1)
+	{
+		HAL_CAN_GetRxMessage(&hcan1, CAN_RX_FIFO0, &CAN_RxHeader, CAN_RxData);
+		isotp_Receive(RXData,&SN,&pRxMailbox);
 	}
 }
 

@@ -10,7 +10,6 @@ static uint8_t seed_valid =0;
 extern uint16_t RX_UDSDataLen;
 extern UART_HandleTypeDef huart1;
 uint8_t RXRequest_Success=0;
-volatile uint8_t AppJumpRequested=0;
 void UDS_Init(void)
 {
 	isotp_Init();
@@ -141,22 +140,24 @@ void UDS_DiagnosticSessionControl(uint8_t *RXData)
 		UDS_NegativeResponse(RXData[0],NRC_SubFunctionNotSupported);
 	}
 }
-UDS_ReturnStatus_t UDS_FlashWrite(uint8_t *RXData)
+void UDS_FlashWrite(uint8_t *RXData)
 {
 	uint32_t Arry_Count=2;
 	uint32_t payload_size;
 	uint32_t remaining_size;
+
 	if ((RX_UDSDataLen < 2U) || (UDS_Status.ReceivedSize >= UDS_Status.DownloadSize))
 	{
 		UDS_NegativeResponse(RXData[0],NRC_RequestSequenceError);
-		return 0x01;
+		return;
 	}
+
 	payload_size=RX_UDSDataLen-2U;
 	remaining_size=UDS_Status.DownloadSize-UDS_Status.ReceivedSize;
 	if ((payload_size == 0U) || (payload_size > remaining_size) || ((payload_size & 1U) != 0U))
 	{
 		UDS_NegativeResponse(RXData[0],NRC_IncorrectMessageLengthOrInvalidFormat);
-		return 0x01;
+		return;
 	}
 	HAL_FLASH_Unlock();
 	while (UDS_Status.AlreadyDealData<payload_size)
@@ -167,7 +168,7 @@ UDS_ReturnStatus_t UDS_FlashWrite(uint8_t *RXData)
 			HAL_FLASH_Lock();
 			UDS_Status.AlreadyDealData=0;
 			UDS_NegativeResponse(RXData[0],NRC_ConditionsNotCorrect);
-			return 0x01;
+			return;
 		}
 		UDS_Status.AlreadyDealData+=2;
 		Arry_Count+=2;
@@ -175,15 +176,10 @@ UDS_ReturnStatus_t UDS_FlashWrite(uint8_t *RXData)
 	HAL_FLASH_Lock();
 	UDS_Status.ReceivedSize+=UDS_Status.AlreadyDealData;
 	UDS_Status.AlreadyDealData=0;
-	uint8_t Return_Data[2] = {0x76, RXData[1]};
-	isotp_Sent(UDS_Header.TxHeader,Return_Data,sizeof(Return_Data),UDS_Header.pTxMailbox);
-	return 0x00;
-}
-void UDS_Flasherase(FLASH_EraseInitTypeDef *pEraseInit, uint32_t *PageError,HAL_StatusTypeDef *ErrorCode)
-{
-	HAL_FLASH_Unlock();
-	*ErrorCode=HAL_FLASHEx_Erase(pEraseInit,PageError);
-	HAL_FLASH_Lock();
+	if (UDS_Status.ReceivedSize == UDS_Status.DownloadSize)
+	{
+		UDS_Status.DownloadActive=0;
+	}
 }
 void UDS_RequestDownloadProgramm(uint8_t *RXData)
 {
@@ -191,44 +187,16 @@ void UDS_RequestDownloadProgramm(uint8_t *RXData)
 	{
 		if (seed_valid==0&&UDS_Status.Lock==DISABLE)
 		{
-			if (RX_UDSDataLen!=11)
-			{
-				UDS_NegativeResponse(RXData[0],NRC_IncorrectMessageLengthOrInvalidFormat);
-				return;
-			}
+			UDS_Status.DownloadActive=1;
 			UDS_Status.DownloadAddress=(uint32_t)RXData[3]<<24|(uint32_t)RXData[4]<<16|(uint32_t)RXData[5]<<8|RXData[6];
 			UDS_Status.DownloadSize=(uint32_t)RXData[7]<<24|(uint32_t)RXData[8]<<16|(uint32_t)RXData[9]<<8|RXData[10];
-			if (UDS_Status.DownloadAddress>=MINFlashAddress&&UDS_Status.DownloadAddress<MIXFlashSize)
-			{
-				if (UDS_Status.DownloadAddress%0x400!=0x00)
-				{
-					UDS_NegativeResponse(RXData[0],NRC_RequestOutOfRange);
-					return;
-				}
-				FLASH_EraseInitTypeDef EraseInitStruct = {FLASH_TYPEERASE_PAGES,FLASH_BANK_1,UDS_Status.DownloadAddress,((UDS_Status.DownloadSize+1024-1)/1024)};
-				uint32_t PageError = 0xFFFFFFFFU;
-				HAL_StatusTypeDef error = HAL_ERROR;
-				UDS_Flasherase(&EraseInitStruct,&PageError,&error);
-				if (error!=HAL_OK)
-				{
-					UDS_NegativeResponse(RXData[0],NRC_ConditionsNotCorrect);
-				}
-				if (error==HAL_OK)
-				{
-					UDS_Status.DownloadActive = 1;
-					UDS_Status.ReceivedSize = 0;
-					UDS_Status.AlreadyDealData = 0;
-					UDS_Status.AlreadyWriteenAddress = 0;
-					UDS_Status.ExpectedBlockCounter = 1;
-					uint8_t Return_Data[4] = {0x74,0x20,0x00,0x3F};
-					isotp_Sent(UDS_Header.TxHeader,Return_Data,sizeof(Return_Data),UDS_Header.pTxMailbox);
-					HAL_UART_Transmit(&huart1,(uint8_t *)"DL_START\r\n",10,100);
-				}
-			}
-			else
-			{
-				UDS_NegativeResponse(RXData[0],NRC_RequestOutOfRange);
-			}
+			UDS_Status.ReceivedSize=0;
+			UDS_Status.AlreadyDealData=0;
+			UDS_Status.AlreadyWriteenAddress=0;
+			uint8_t Return_Data[2];
+			Return_Data[0]=0x74;
+			Return_Data[1]=0x20;
+			isotp_Sent(UDS_Header.TxHeader,Return_Data,2,UDS_Header.pTxMailbox);
 		}
 	}
 	else
@@ -240,75 +208,7 @@ void UDS_DownloadProgramm(uint8_t *RXData)
 {
 	if (UDS_Status.DownloadActive==1)
 	{
-		if (RXData[1]==UDS_Status.ExpectedBlockCounter)
-		{
-			if (UDS_FlashWrite(RXData)==ok)
-			{
-				UDS_Status.ExpectedBlockCounter++;
-			}
-			if (UDS_Status.ReceivedSize==UDS_Status.DownloadSize)
-			{
-				UDS_Status.ExpectedBlockCounter=0;
-			}
-		}
-		else
-		{
-			UDS_NegativeResponse(RXData[0],NRC_WrongBlockSequenceCounter);
-			return;
-		}
-	}
-	else
-	{
-		UDS_NegativeResponse(RXData[0],NRC_ConditionsNotCorrect);
-	}
-}
-void UDS_RequestTransferExit(uint8_t *RXData)
-{
-	uint32_t TesterCRC;
-	uint32_t FlashCRC=0xFFFFFFFFU;
-	const uint8_t *FlashData=(const uint8_t *)UDS_Status.DownloadAddress;
-
-	if (UDS_Status.DownloadSize==0)
-	{
-		UDS_NegativeResponse(RXData[0],NRC_RequestSequenceError);
-		return;
-	}
-	if (UDS_Status.ReceivedSize==UDS_Status.DownloadSize)
-	{
-		if (RX_UDSDataLen!=5U)
-		{
-			UDS_NegativeResponse(RXData[0],NRC_IncorrectMessageLengthOrInvalidFormat);
-			return;
-		}
-
-		TesterCRC=((uint32_t)RXData[1]<<24)|((uint32_t)RXData[2]<<16)|
-		          ((uint32_t)RXData[3]<<8)|RXData[4];
-		for (uint32_t i=0;i<UDS_Status.DownloadSize;i++)
-		{
-			FlashCRC^=FlashData[i];
-			for (uint8_t Bit=0;Bit<8U;Bit++)
-			{
-				FlashCRC=(FlashCRC&1U)?((FlashCRC>>1)^0xEDB88320U):(FlashCRC>>1);
-			}
-		}
-		FlashCRC^=0xFFFFFFFFU;
-		if (FlashCRC!=TesterCRC)
-		{
-			UDS_NegativeResponse(RXData[0],NRC_GeneralProgrammingFailure);
-			HAL_UART_Transmit(&huart1,(uint8_t *)"CRC_FAIL\r\n",10,100);
-			return;
-		}
-
-		UDS_Status.DownloadActive =0;
-		uint8_t Return_Data[1];
-		Return_Data[0]=0x77;
-		isotp_Sent(UDS_Header.TxHeader, Return_Data, 1, UDS_Header.pTxMailbox);
-		HAL_UART_Transmit(&huart1,(uint8_t *)"DL_DONE\r\n",9,100);
-		AppJumpRequested=1;
-	}
-	else
-	{
-		UDS_NegativeResponse(RXData[0],NRC_RequestSequenceError);
+		UDS_FlashWrite(RXData);
 	}
 }
 void UDS_RequestSeed_Level1(uint8_t *RXData)
@@ -378,13 +278,12 @@ void UDS_SecurityAccess(uint8_t *RXData)
 		UDS_NegativeResponse(RXData[0],NRC_ConditionsNotCorrect);
 		}
 }
-UDSDriver_t UDS_Driver[6]={
+UDSDriver_t UDS_Driver[5]={
 	{ReadDataByIdentifier,UDS_ReadDataByIdentifier},
 	{DiagnosticSessionControl,UDS_DiagnosticSessionControl},
 	{SecurityAccess,UDS_SecurityAccess},
 	{RequestDownload,UDS_RequestDownloadProgramm},
 	{DownloadData,UDS_DownloadProgramm},
-	{RequestTransferExit,UDS_RequestTransferExit},
 };
 void UDS_Execute(uint8_t *RXData)
 {

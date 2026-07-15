@@ -46,23 +46,83 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-
+static uint8_t Boot_IsAppValid(void);
+static void Boot_JumpToApp(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint8_t RXData[64];
-CAN_TxHeaderTypeDef TXHeader={0x111,0,CAN_ID_STD,CAN_RTR_DATA,8,DISABLE};
+uint8_t RXData[1024];
+CAN_TxHeaderTypeDef TXHeader={0x7E8,0,CAN_ID_STD,CAN_RTR_DATA,8,DISABLE};
 CAN_RxHeaderTypeDef CAN_RxHeader;
 uint32_t pTxMailbox;
 uint32_t pRxMailbox;
 uint8_t SN;
+
+#define APP_START_ADDRESS 0x08008000U
+
+__attribute__((naked,noreturn)) static void Boot_StartApp(uint32_t AppStack,uint32_t AppResetHandler)
+{
+  __asm volatile(
+    "msr msp,r0\n"
+    "cpsie i\n"
+    "bx r1\n"
+  );
+}
+
+static uint8_t Boot_IsAppValid(void)
+{
+  uint32_t AppStack=*(uint32_t *)APP_START_ADDRESS;
+  uint32_t AppResetHandler=*(uint32_t *)(APP_START_ADDRESS+4U);
+  if ((AppStack<0x20000000U)||(AppStack>0x20005000U))
+  {
+    return 0;
+  }
+  if ((AppResetHandler<APP_START_ADDRESS)||(AppResetHandler>=0x08010000U))
+  {
+    return 0;
+  }
+  return 1;
+}
+
+static void Boot_JumpToApp(void)
+{
+  uint32_t AppStack=*(uint32_t *)APP_START_ADDRESS;
+  uint32_t AppResetHandler=*(uint32_t *)(APP_START_ADDRESS+4U);
+
+  if (Boot_IsAppValid()==0)
+  {
+    return;
+  }
+
+  HAL_CAN_Stop(&hcan1);
+  HAL_RCC_DeInit();
+  HAL_DeInit();
+
+  __disable_irq();
+
+
+  SysTick->CTRL=0;
+  SysTick->LOAD=0;
+  SysTick->VAL=0;
+
+  SCB->ICSR=SCB_ICSR_PENDSTCLR_Msk|SCB_ICSR_PENDSVCLR_Msk;
+
+  NVIC->ICER[0]=0xFFFFFFFFU;
+  NVIC->ICER[1]=0xFFFFFFFFU;
+  NVIC->ICPR[0]=0xFFFFFFFFU;
+  NVIC->ICPR[1]=0xFFFFFFFFU;
+
+  SCB->VTOR=APP_START_ADDRESS;
+  __DSB();
+  __ISB();
+  Boot_StartApp(AppStack,AppResetHandler);
+}
 /* USER CODE END 0 */
 
 /**
@@ -73,7 +133,6 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -96,18 +155,20 @@ int main(void)
   MX_GPIO_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
+
   UDS_Init();
-  uint8_t TXData[15]={0x34,0x02,0x12,0x39};
+
   /* USER CODE END 2 */
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  isotp_Sent(&TXHeader,TXData,2, &pTxMailbox);
-
   while (1)
   {
-    HAL_Delay(500);
     UDS_Divide_ID(RXData);
-    HAL_UART_Transmit(&huart1,RXData,3,HAL_MAX_DELAY);
+    if (AppJumpRequested==1)
+    {
+      HAL_Delay(100);
+      Boot_JumpToApp();
+    }
   }
   /* USER CODE END 3 */
 }
